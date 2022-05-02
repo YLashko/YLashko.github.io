@@ -14,12 +14,74 @@
     max-width: 25%;
 }
 
-#info-box-box {
+#info-floating-box {
     position: sticky;
     top: 16px;
+}
+
+#item-info-box {
     border: 2px solid rgb(158, 158, 158);
     border-radius: 5px;
     padding: 4px;
+    min-height: 200px;
+}  
+
+.slider {
+    -webkit-appearance: none;
+    width: 97%;
+    height: 10px;
+    border-radius: 3px;  
+    background: #838383;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+  
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 18%; 
+    background: #d5d5d5;
+    cursor: pointer;
+}
+  
+.slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 25%;
+    background: #d5d5d5;
+    cursor: pointer;
+}
+
+.slidecontainer {
+    width: 65%;
+}
+
+.short-slidecontainer {
+    width: 49%;
+}
+
+.num-input {
+    width: 12%;
+    height: 14px;
+    background-color: #838383;
+    border-radius: 7px;
+    border:1px solid #2b2b2b;
+    color:white;
+}
+
+.num-input:focus {
+    outline: none;
+}
+
+#chances-calculate-box {
+    border: 2px solid rgb(158, 158, 158);
+    border-radius: 5px;
+    padding: 4px;
+    min-height: 200px;
+    margin-top: 7px;
 }
 
 h2 {
@@ -51,6 +113,30 @@ p {
     max-width: 100%;
 }
 
+#chance-slider-full-box, #amount-slider-full-box, #LCamount-slider-full-box {
+    display: flex;
+    width: 100%;
+    margin-bottom: 4px;
+    border-top: 2px solid rgb(83, 83, 83);
+    padding-top: 3px;
+}
+
 img:hover {
     background-color: rgb(75, 75, 75);
+}
+
+h6 {
+    margin: 0px;
+    width: 5%;
+    color: white;
+    font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+h5 {
+    width: 20%;
+    margin: 0px;
+    color: white;
+    font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
 }
