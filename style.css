@@ -140,3 +140,8 @@ h5 {
     font-size: 16px;
     font-family: 'Open Sans', sans-serif;
 }
+
+.download-btn {
+    font-size: 40px;
+    color: rgb(27, 27, 27);
+}

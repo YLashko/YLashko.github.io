@@ -1,0 +1,223 @@
+-------------------------------------------------------------[Frame relay]-------------------------------------------------------------
+
+--[R1]--
+
+en
+conf t
+host r1
+int s0/0/0
+ip address 172.16.0.1 255.255.255.0
+no shut
+
+int g0/0
+ip address 192.168.1.1 255.255.255.0
+no shut
+
+--[R2]--
+
+en
+conf t
+host r1
+int s0/0/0
+ip address 172.16.0.2 255.255.255.0
+no shut
+
+int g0/0
+ip address 192.168.2.1 255.255.255.0
+no shut
+
+--[R3]--
+
+en
+conf t
+host r1
+int s0/0/0
+ip address 172.16.0.3 255.255.255.0
+no shut
+
+int g0/0
+ip address 192.168.3.1 255.255.255.0
+no shut
+
+--[PC1]--
+
+Ip configuration:
+	Ipv4 address 192.168.1.10
+	Subnet mask 255.255.255.0
+	Default gateway 192.168.1.1
+
+--[PC2]--
+
+Ip configuration:
+	Ipv4 address 192.168.2.10
+	Subnet mask 255.255.255.0
+	Default gateway 192.168.2.1
+	
+--[PC3]--
+
+Ip configuration:
+	Ipv4 address 192.168.3.10
+	Subnet mask 255.255.255.0
+	Default gateway 192.168.3.1
+	
+--[Cloud1]--
+
+Serial 0:
+	Dlci 42
+	Name ZR1DOR2
+	Dlci 43
+	Name ZR1DOR3
+
+Serial 1:
+	Dlci 21
+	Name ZR2DOR1
+	Dlci 23
+	Name ZR2DOR3
+
+Serial 2:
+	Dlci 31
+	Name ZR3DOR1
+	Dlci 32
+	Name ZR3DOR2
+
+Frame relay:
+	1:
+		From port Serial0
+		Sublink ZR1DOR2
+		To port Serial1
+		Sublink ZR2DOR1
+	2:
+		From port Serial1
+		Sublink ZR2DOR3
+		To port Serial2
+		Sublink ZR3DOR2
+	2:
+		From port Serial2
+		Sublink ZR3DOR1
+		To port Serial0
+		Sublink ZR1DOR3
+
+--[R1]--
+
+router rip
+ver 2 
+net 192.168.1.0
+net 172.16.0.0
+exit
+int s0/0/0
+encapsulation frame-relay
+no frame-relay inverse-arp
+frame-relay map ip 172.16.0.2 42 broadcast cisco
+frame-relay map ip 172.16.0.3 43 broadcast cisco
+exit
+
+--[R2]--
+
+router rip
+ver 2 
+net 192.168.2.0
+net 172.16.0.0
+exit
+int s0/0/0
+encapsulation frame-relay
+no frame-relay inverse-arp
+frame-relay map ip 172.16.0.1 21 broadcast cisco
+frame-relay map ip 172.16.0.3 23 broadcast cisco
+exit
+
+--[R3]--
+
+router rip
+ver 2 
+net 192.168.3.0
+net 172.16.0.0
+exit
+int s0/0/0
+encapsulation frame-relay
+no frame-relay inverse-arp
+frame-relay map ip 172.16.0.1 31 broadcast cisco
+frame-relay map ip 172.16.0.2 32 broadcast cisco
+exit
+
+-------------------------------------------------[VPN (Starting point :: frame-relay)]-------------------------------------------------
+
+--[Server0]--
+
+Global settings:
+	Ipv4:
+		Default gateway 192.168.3.1
+	
+Fast ethernet 0:
+	Ipv4 address 192.168.3.110
+	Subnet mask 255.255.255.0
+
+AAA:
+	Network configuration:
+		Client name ServerVPN
+		Client ip 192.168.3.1
+		Secret uek2022
+		Server type radius
+	
+	User setup:
+		username michal
+		password michal
+		username adam
+		password adam
+	
+--[R3]--
+
+en
+conf t
+host ServerVPN
+aaa new-model
+aaa authentication login VPN group radius local
+aaa authorization network VPN local
+exit
+license boot module c1900 technology-package securityk9
+exit
+wr
+reload
+en 
+conf t
+crypto crypto isakm policy 10
+encryption aes 256 
+authentication pre-share
+group 2
+exit
+crypto isakmp client configuration group VPNUEK 
+key VPNUEK
+pool VPNKLIENTY
+netmask 255.255.255.0
+exit
+crypto ipsec transform-set VPNTRANSMISJA esp-3
+crypto ipsec transform-set VPNTRANSMISJA esp-3des esp-sha-hmac
+crypto dynamic-map MAPA 10
+set transform-set VPNTRANSMISJA
+reverse-route 
+exit
+crypto map MAPA isakmp authorization list VPN
+crypto map MAPA client authentication list VPN
+crypto map MAPA client configuration address respond 
+crypto map MAPA 10 ipsec-isakmp dynamic MAPA
+ip local pool VPNKLIENTY 192.168.3.200 192.168.3.230
+radius-server host 192.168.3.110 auth-port 1645 key uek2022
+int s0/0/0
+crypto map MAPA
+
+--[PC1]--
+
+Vpn configuration:
+	Group name VPNUEK
+	Group key VPNUEK
+	Host ip 172.16.0.3
+	Username michal
+	password michal
+
+--[PC0]--
+
+Vpn configuration:
+	Group name VPNUEK
+	Group key VPNUEK
+	Host ip 172.16.0.3
+	Username adam
+	password adam
