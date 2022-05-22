@@ -62,7 +62,6 @@ function inputAmount(event) {
 }
 
 function inputLCAmount(event) {
-    console.log(chance, amount, LCamount);
     if (!isNaN(event.value)){
         globalThis.LCamount = cut(event.value, 0, 5);
     }
