@@ -221,3 +221,124 @@ Vpn configuration:
 	Host ip 172.16.0.3
 	Username adam
 	password adam
+-------------------------------------------------------------[VOIP phone]--------------------------------------------------------------
+
+--[R0]--
+en 
+conf t
+host r1
+int f0/1
+ip address 172.16.1.1 255.255.255.0
+no shut
+int f0/0
+ip address 192.168.1.1 255.255.255.0
+no shut
+exit
+ip route 192.168.2.0 255.255.255.0 f0/1
+exit
+conf t
+ip dhcp excluded-address 192.168.1.1
+ip dhcp pool VOIP1
+network 192.168.1.0 255.255.255.0
+default-router 192.168.1.1
+option 150 ip 192.168.1.1
+exit
+
+--[R1]--
+en 
+conf t
+host r2
+int f0/1
+ip address 172.16.1.2 255.255.255.0
+no shut
+int f0/0
+ip address 192.168.2.1 255.255.255.0
+no shut
+exit
+ip route 192.168.1.0 255.255.255.0 f0/1
+exit
+conf t
+ip dhcp excluded-address 192.168.2.1
+ip dhcp pool VOIP1
+network 192.168.2.0 255.255.255.0
+default-router 192.168.2.1
+option 150 ip 192.168.2.1
+exit
+
+--[R0]--
+
+en
+conf t
+telephony-service
+max-dn 4
+max-ephones 4
+ip source-address 192.168.1.1 port 2000
+ephone-dn 1
+number 140
+exit
+ephone-dn 2
+number 220
+exit
+ephone 1
+button 1:1
+exit
+ephone 2
+button 1:2
+exit
+
+--[R1]--
+
+en
+conf t
+telephony-service
+max-dn 4
+max-ephones 4
+ip source-address 192.168.2.1 port 2000
+ephone-dn 1
+number 320
+exit
+ephone-dn 2
+number 340
+exit
+ephone 1
+button 1:1
+exit
+ephone 2
+button 1:2
+exit
+
+--[SW0]--
+
+en
+conf t
+int range fa0/1 -2
+switchport mode access
+switchport voice vlan 1
+exit
+
+--[SW1]--
+
+en
+conf t
+int range fa0/1 -2
+switchport mode access
+switchport voice vlan 1
+exit
+
+--[R0]--
+
+en
+conf t
+dial-peer voice 1 voip
+destination-pattern ...
+session target ipv4:172.16.1.2
+exit
+
+--[R1]--
+
+en
+conf t
+dial-peer voice 1 voip
+destination-pattern ...
+session target ipv4:172.16.1.1
+exit
