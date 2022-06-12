@@ -121,7 +121,7 @@ p {
     padding-top: 3px;
 }
 
-img:hover {
+.item-image:hover {
     background-color: rgb(75, 75, 75);
 }
 
@@ -141,7 +141,21 @@ h5 {
     font-family: 'Open Sans', sans-serif;
 }
 
-.download-btn {
-    font-size: 40px;
-    color: rgb(27, 27, 27);
+.git-link {
+    font-size: 78px;
+    font-family: 'Open Sans', sans-serif;
+    color: #2b2b2b;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.fandom-link, .info-text {
+    font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
+    color: #2b2b2b;
+}
+
+#info-bottom-container {
+    margin-top: 12px;
+    text-align: center;
 }
